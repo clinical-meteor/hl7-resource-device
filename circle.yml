@@ -46,6 +46,7 @@ dependencies:
     - cd helloworld/packages/hl7-resource-device/tests && ls -la
     - cd helloworld/packages/hl7-resource-device/tests/gagarin && ls -la
     - cd helloworld && starrynight autoconfig
+    - cd helloworld && meteor npm install
 
 ## Customize test commands
 test:
