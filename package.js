@@ -1,6 +1,6 @@
 Package.describe({
   name: 'clinical:hl7-resource-device',
-  version: '1.2.0',
+  version: '1.2.1',
   summary: 'HL7 FHIR Resource - Device',
   git: 'https://github.com/clinical-meteor/hl7-resource-device',
   documentation: 'README.md'
@@ -27,7 +27,7 @@ Package.onUse(function (api) {
   api.use('clinical:hl7-resource-bundle@1.3.10');
   api.use('matb33:collection-hooks@0.7.15');
 
-  api.addFiles('lib/Devices.js', ['client', 'server']);
+  api.addFiles('lib/Devices.js');
 
   api.addFiles('server/rest.js', 'server');
   api.addFiles('server/initialize.js', 'server');

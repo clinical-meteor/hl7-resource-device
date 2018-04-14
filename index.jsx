@@ -1,8 +1,6 @@
 
-
 import DevicesPage from './client/DevicesPage';
 import DevicesTable from './client/DevicesTable';
-import { Device, Devices, DeviceSchema } from './lib/Devices';
 
 var DynamicRoutes = [{
   'name': 'DevicesPage',
@@ -22,11 +20,7 @@ export {
   DynamicRoutes, 
 
   DevicesPage,
-  DevicesTable,
-
-  Device,
-  Devices,
-  DeviceSchema
+  DevicesTable
 };
 
 
