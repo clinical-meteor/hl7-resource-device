@@ -32,6 +32,6 @@ If you're working with HL7 FHIR Resources, we recommend using [Postman](https://
 
 
 
-#### Licensing  
+#### Acknowledgements     
 
-![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)
+Many thanks to Universal Hospital Services and iHealth Labs for their generous support in sponsoring this package.   
