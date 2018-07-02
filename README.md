@@ -1,4 +1,4 @@
-##clinical:hl7-resource-device
+## clinical:hl7-resource-device
 
 #### Licensing  
 
