@@ -12,7 +12,7 @@
 
 #### API Reference  
 
-The resource in this package implements Contract resource schema, specified at [https://www.hl7.org/fhir/device.html](https://www.hl7.org/fhir/device.html).  
+The resource in this package implements Device resource schema, specified at [https://www.hl7.org/fhir/DSTU2/device.html](https://www.hl7.org/fhir/DSTU2/device.html).  
 
 
 #### Installation  
