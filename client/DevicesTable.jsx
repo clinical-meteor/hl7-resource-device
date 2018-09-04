@@ -32,14 +32,14 @@ export default class DevicesTable extends React.Component {
 
   rowClick(id){
     Session.set('devicesUpsert', false);
-    Session.set('selectedDevice', id);
+    Session.set('selectedDeviceId', id);
     Session.set('devicePageTabIndex', 2);
   };
   render () {
     let tableRows = [];
     for (var i = 0; i < this.data.devices.length; i++) {
       tableRows.push(
-        <tr key={i} className="deviceRow" style={this.data.style.text} onClick={ this.rowClick.bind('this', this.data.devices[i]._id)} >
+        <tr key={i} className="deviceRow" style={{cursor: "pointer"}} onClick={ this.rowClick.bind('this', this.data.devices[i]._id)} >
 
           <td className='deviceType'>{this.data.devices[i].type.text }</td>
           <td className='manufacturer'>{this.data.devices[i].manufacturer }</td>
@@ -52,7 +52,7 @@ export default class DevicesTable extends React.Component {
     }
 
     return(
-      <Table id='devicesTable' responses hover >
+      <Table id='devicesTable' hover >
         <thead>
           <tr>
             <th className='deviceType'>type</th>

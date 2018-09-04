@@ -12,6 +12,9 @@ import DevicesTable from './DevicesTable';
 import { Meteor } from 'meteor/meteor';
 import { Session } from 'meteor/session';
 
+Session.setDefault('fhirVersion', 'v1.0.2');
+Session.setDefault('selectedDeviceId', false);
+
 export class DevicesPage extends React.Component {
   getMeteorData() {
     let data = {
@@ -24,8 +27,16 @@ export class DevicesPage extends React.Component {
       },
       tabIndex: Session.get('devicePageTabIndex'),
       deviceSearchFilter: Session.get('deviceSearchFilter'),
-      currentDevice: Session.get('selectedDevice')
+      currentDeviceId: Session.get('selectedDeviceId'),
+      fhirVersion: Session.get('fhirVersion'),
+      selectedDevice: false
     };
+
+    if (Session.get('selectedDeviceId')){
+      data.selectedDevice = Devices.findOne({_id: Session.get('selectedDeviceId')});
+    } else {
+      data.selectedDevice = false;
+    }
 
     data.style = Glass.blur(data.style);
     data.style.appbar = Glass.darkroom(data.style.appbar);
@@ -39,7 +50,7 @@ export class DevicesPage extends React.Component {
   }
 
   onNewTab(){
-    Session.set('selectedDevice', false);
+    Session.set('selectedDeviceId', false);
     Session.set('deviceUpsert', false);
   }
 
@@ -53,13 +64,21 @@ export class DevicesPage extends React.Component {
             <CardText>
               <Tabs id="devicesPageTabs" default value={this.data.tabIndex} onChange={this.handleTabChange} initialSelectedIndex={1}>
                <Tab className='newDeviceTab' label='New' style={this.data.style.tab} onActive={ this.onNewTab } value={0}>
-                 <DeviceDetail id='newDevice' />
+                 <DeviceDetail 
+                  id='newDevice'
+                  fhirVersion={ this.data.fhirVersion }
+                  device={ this.data.selectedDevice }
+                  deviceId={ this.data.currentDeviceId } />  
                </Tab>
                <Tab className="deviceListTab" label='Devices' onActive={this.handleActive} style={this.data.style.tab} value={1}>
                 <DevicesTable />
                </Tab>
                <Tab className="deviceDetailsTab" label='Detail' onActive={this.handleActive} style={this.data.style.tab} value={2}>
-                 <DeviceDetail id='deviceDetails' />
+                 <DeviceDetail 
+                  id='deviceDetails' 
+                  fhirVersion={ this.data.fhirVersion }
+                  device={ this.data.selectedDevice }
+                  deviceId={ this.data.currentDeviceId } />  
                </Tab>
              </Tabs>
             </CardText>

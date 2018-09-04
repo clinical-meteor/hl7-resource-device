@@ -1,12 +1,23 @@
+// =======================================================================
+// Using DSTU2  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//
+// https://www.hl7.org/fhir/DSTU2/devices.html
+//
+//
+// =======================================================================
+
+
 import { CardActions, CardText } from 'material-ui/Card';
 
-import { Bert } from 'meteor/clinical:alert';
+// import { Bert } from 'meteor/clinical:alert';
 import RaisedButton from 'material-ui/RaisedButton';
 import React from 'react';
 import { ReactMeteorData } from 'meteor/react-meteor-data';
 import ReactMixin from 'react-mixin';
 import TextField from 'material-ui/TextField';
 import PropTypes from 'prop-types';
+import { Col, Grid, Row } from 'react-bootstrap';
+import { get, set } from 'lodash';
 
 import { Meteor } from 'meteor/meteor';
 import { Session } from 'meteor/session';
@@ -14,68 +25,100 @@ import { Session } from 'meteor/session';
 import { GlassCard, VerticalCanvas, Glass } from 'meteor/clinical:glass-ui';
 
 
-let defaultDevice = {
-  "resourceType": "Device",
-  "identifier": [{
-    "type": {
-      "coding": [
-        {
-          "system": "http://hl7.org/fhir/identifier-type",
-          "code": "SNO"
-        }
-      ],
-      "text": "Serial Number"
-    },
-    "value": ""
-  }],
-  "type": {
-    "text": ""
-  },
-  "status": "available",
-  "manufacturer": "",
-  "model": "",
-  "lotNumber": "",
-  "contact": [{
-    "resourceType": "ContactPoint",
-    "system": "phone",
-    "value": ""
-  }]
-};
+
 
 Session.setDefault('deviceUpsert', false);
-Session.setDefault('selectedDevice', false);
 
+export class DeviceDetail extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      deviceId: false,
+      device: {
+        resourceType: "Device",
+        identifier: [{
+          type: {
+            coding: [
+              {
+                system: "http://hl7.org/fhir/identifier-type",
+                code: "SNO"
+              }
+            ],
+            text: "Serial Number"
+          },
+          value: ""
+        }],
+        type: {
+          text: ""
+        },
+        status: "available",
+        manufacturer: "",
+        model: "",
+        lotNumber: "",
+        contact: [{
+          resourceType: "ContactPoint",
+          system: "phone",
+          value: ""
+        }]
+      },
+      form: {
+        deviceType: '',
+        manufacturer: '',
+        model: '',
+        serialNumber: ''
+      }
+    }
+  }
+  dehydrateFhirResource(device) {
+    let formData = Object.assign({}, this.state.form);
 
-export default class DeviceDetail extends React.Component {
+    formData.deviceType = get(device, 'type.text')
+    formData.manufacturer = get(device, 'manufacturer')    
+    formData.model = get(device, 'model')
+    formData.serialNumber = get(device, 'identifier[0].value')
+
+    return formData;
+  }
+  shouldComponentUpdate(nextProps){
+    process.env.NODE_ENV === "test" && console.log('DeviceDetail.shouldComponentUpdate()', nextProps, this.state)
+    let shouldUpdate = true;
+
+    // both false; don't take any more updates
+    if(nextProps.device === this.state.device){
+      shouldUpdate = false;
+    }
+
+    // received an device from the table; okay lets update again
+    if(nextProps.deviceId !== this.state.deviceId){
+      this.setState({deviceId: nextProps.deviceId})
+      
+      if(nextProps.device){
+        this.setState({device: nextProps.device})     
+        this.setState({form: this.dehydrateFhirResource(nextProps.device)})       
+      }
+      shouldUpdate = true;
+    }
+ 
+    return shouldUpdate;
+  }
   getMeteorData() {
     let data = {
-      deviceId: false,
-      device: defaultDevice
+      deviceId: this.props.deviceId,
+      device: false,
+      form: this.state.form
     };
 
-    if (Session.get('deviceUpsert')) {
-      data.device = Session.get('deviceUpsert');
-    } else {
-      if (Session.get('selectedDevice')) {
-        data.deviceId = Session.get('selectedDevice');
-        console.log("selectedDevice", Session.get('selectedDevice'));
-
-        let selectedDevice = Devices.findOne({_id: Session.get('selectedDevice')});
-        console.log("selectedDevice", selectedDevice);
-
-        if (selectedDevice) {
-          data.device = selectedDevice;
-        }
-      } else {
-        data.device = defaultDevice;
-      }
-
+    if(this.props.device){
+      data.device = this.props.device;
     }
 
     return data;
   }
 
   render() {
+    if(process.env.NODE_ENV === "test") console.log('DeviceDetail.render()', this.state)
+    let formData = this.state.form;
+
     return (
       <div id={this.props.id} className="deviceDetail">
         <CardText>
@@ -84,8 +127,10 @@ export default class DeviceDetail extends React.Component {
             ref='deviceType'
             name='deviceType'
             floatingLabelText='Device Type'
-            value={this.data.device.type ? this.data.device.type.text : ''}
+            hintText="Floor Scale"
+            value={ get(formData, 'deviceType', '') }
             onChange={ this.changeState.bind(this, 'deviceType')}
+            floatingLabelFixed={true}
             fullWidth
             /><br/>
           <TextField
@@ -93,8 +138,10 @@ export default class DeviceDetail extends React.Component {
             ref='manufacturer'
             name='manufacturer'
             floatingLabelText='Manufacturer'
-            value={this.data.device.manufacturer ? this.data.device.manufacturer : ''}
+            hintText="Withings"
+            value={ get(formData, 'manufacturer', '') }
             onChange={ this.changeState.bind(this, 'manufacturer')}
+            floatingLabelFixed={true}
             fullWidth
             /><br/>
           <TextField
@@ -102,17 +149,21 @@ export default class DeviceDetail extends React.Component {
             ref='deviceModel'
             name='deviceModel'
             floatingLabelText='Model'
-            value={this.data.device.model ? this.data.device.model : ''}
+            hintText='Cardio WiFi'
+            value={ get(formData, 'model', '') }
             onChange={ this.changeState.bind(this, 'deviceModel')}
+            floatingLabelFixed={true}
             fullWidth
             /><br/>
           <TextField
             id='serialNumberInput'
             ref='serialNumber'
             name='serialNumber'
+            hintText='GN-23-01'
             floatingLabelText='Serial Number'
-            value={this.data.device.identifier[0] ? this.data.device.identifier[0].value :  ''}
+            value={ get(formData, 'serialNumber', '') }
             onChange={ this.changeState.bind(this, 'serialNumber')}
+            floatingLabelFixed={true}
             fullWidth
             /><br/>
         </CardText>
@@ -122,7 +173,6 @@ export default class DeviceDetail extends React.Component {
       </div>
     );
   }
-
 
   determineButtons(deviceId){
     if (deviceId) {
@@ -138,65 +188,93 @@ export default class DeviceDetail extends React.Component {
       );
     }
   }
-
-
-
-  // this could be a mixin
-  changeState(field, event, value){
-    let deviceUpdate;
-
-    if(process.env.NODE_ENV === "test") console.log("DeviceDetail.changeState", field, event, value);
-
-    // by default, assume there's no other data and we're creating a new device
-    if (Session.get('deviceUpsert')) {
-      deviceUpdate = Session.get('deviceUpsert');
-    } else {
-      deviceUpdate = defaultDevice;
-    }
-
-
-
-    // if there's an existing device, use them
-    if (Session.get('selectedDevice')) {
-      deviceUpdate = this.data.device;
-    }
+  updateFormData(formData, field, textValue){
+    if(process.env.NODE_ENV === "test") console.log("ConditionDetail.updateFormData", formData, field, textValue);
 
     switch (field) {
       case "deviceType":
-        deviceUpdate.type.text = value;
+        set(formData, 'deviceType', textValue)
         break;
       case "manufacturer":
-        deviceUpdate.manufacturer = value;
-        break;
+        set(formData, 'manufacturer', textValue)
+        break;        
       case "deviceModel":
-        deviceUpdate.model = value;
+        set(formData, 'model', textValue)
         break;
       case "serialNumber":
-        deviceUpdate.identifier[0].value = value;
+        set(formData, 'serialNumber', textValue)
         break;
       default:
-
     }
 
-    if(process.env.NODE_ENV === "test") console.log("deviceUpdate", deviceUpdate);
-    Session.set('deviceUpsert', deviceUpdate);
+    if(process.env.NODE_ENV === "test") console.log("formData", formData);
+    return formData;
+  }
+  updateDevice(deviceData, field, textValue){
+    if(process.env.NODE_ENV === "test") console.log("DeviceDetail.updateDevice", deviceData, field, textValue);
+
+    switch (field) {
+      case "deviceType":
+        set(deviceData, 'type.text', textValue)
+        break;
+      case "manufacturer":
+        set(deviceData, 'manufacturer', textValue)
+        break;
+      case "deviceModel":
+        set(deviceData, 'model', textValue)
+        break;
+      case "serialNumber":
+        set(deviceData, 'identifier[0].value', textValue)
+        break;      
+    }
+    return deviceData;
+  }
+  componentDidUpdate(props){
+    if(process.env.NODE_ENV === "test") console.log('DeviceDisplay.componentDidUpdate()', props, this.state)
+  }
+  changeState(field, event, textValue){
+    if(process.env.NODE_ENV === "test") console.log("   ");
+    if(process.env.NODE_ENV === "test") console.log("DeviceDetail.changeState", field, textValue);
+    if(process.env.NODE_ENV === "test") console.log("this.state", this.state);
+
+    let formData = Object.assign({}, this.state.form);
+    let deviceData = Object.assign({}, this.state.device);
+
+    formData = this.updateFormData(formData, field, textValue);
+    deviceData = this.updateDevice(deviceData, field, textValue);
+
+    if(process.env.NODE_ENV === "test") console.log("deviceData", deviceData);
+    if(process.env.NODE_ENV === "test") console.log("formData", formData);
+
+    this.setState({device: deviceData})
+    this.setState({form: formData})
   }
 
   handleSaveButton(){
-    let deviceUpdate = Session.get('deviceUpsert', deviceUpdate);
+    if(process.env.NODE_ENV === "test") console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&&')
+    console.log('Saving a new Device...', this.state)
 
-    if(process.env.NODE_ENV === "test") console.log("deviceUpdate", deviceUpdate);
+    let fhirDeviceData = Object.assign({}, this.state.device);
+
+    if(process.env.NODE_ENV === "test") console.log('fhirDeviceData', fhirDeviceData);
 
 
-    if (Session.get('selectedDevice')) {
+    let deviceValidator = ConditionSchema.newContext();
+    deviceValidator.validate(fhirDeviceData)
+
+    console.log('IsValid: ', deviceValidator.isValid())
+    console.log('ValidationErrors: ', deviceValidator.validationErrors());
+
+    if (this.data.deviceId) {
       if(process.env.NODE_ENV === "test") console.log("Updating device...");
-      delete deviceUpdate._id;
-
-      // not sure why we're having to respecify this; fix for a bug elsewhere
-      deviceUpdate.resourceType = 'Device';
+      delete fhirDeviceData._id;
 
       Devices.update(
-        {_id: Session.get('selectedDevice')}, {$set: deviceUpdate }, function(error, result) {
+        {_id: this.data.deviceId}, {$set: fhirDeviceData }, {
+          validate: false, 
+          filter: false, 
+          removeEmptyStrings: false
+        }, function(error, result) {
           if (error) {
             console.log("error", error);
 
@@ -212,9 +290,13 @@ export default class DeviceDetail extends React.Component {
         });
     } else {
 
-      if(process.env.NODE_ENV === "test") console.log("create a new device", deviceUpdate);
+      if(process.env.NODE_ENV === "test") console.log("create a new device", fhirDeviceData);
 
-      Devices.insert(deviceUpdate, function(error, result) {
+      Devices.insert(fhirDeviceData, {
+        validate: false, 
+        filter: false, 
+        removeEmptyStrings: false
+      }, function(error, result) {
         if (error) {
           Bert.alert(error.reason, 'danger');
         }
@@ -234,7 +316,7 @@ export default class DeviceDetail extends React.Component {
   }
 
   handleDeleteButton(){
-    Device.remove({_id: Session.get('selectedDevice')}, function(error, result){
+    Devices.remove({_id: this.data.deviceId}, function(error, result){
       if (error) {
         Bert.alert(error.reason, 'danger');
       }
@@ -251,6 +333,9 @@ export default class DeviceDetail extends React.Component {
 
 
 DeviceDetail.propTypes = {
-  hasUser: PropTypes.object
+  id: PropTypes.string,
+  deviceId: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
+  device: PropTypes.oneOfType([PropTypes.object, PropTypes.bool])
 };
 ReactMixin(DeviceDetail.prototype, ReactMeteorData);
+export default DeviceDetail;
