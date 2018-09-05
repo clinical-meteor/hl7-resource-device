@@ -254,12 +254,13 @@ export class DeviceDetail extends React.Component {
     if(process.env.NODE_ENV === "test") console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&&')
     console.log('Saving a new Device...', this.state)
 
+    let self = this;
     let fhirDeviceData = Object.assign({}, this.state.device);
 
     if(process.env.NODE_ENV === "test") console.log('fhirDeviceData', fhirDeviceData);
 
 
-    let deviceValidator = ConditionSchema.newContext();
+    let deviceValidator = DeviceSchema.newContext();
     deviceValidator.validate(fhirDeviceData)
 
     console.log('IsValid: ', deviceValidator.isValid())
@@ -281,7 +282,7 @@ export class DeviceDetail extends React.Component {
             Bert.alert(error.reason, 'danger');
           }
           if (result) {
-            HipaaLogger.logEvent({eventType: "update", userId: Meteor.userId(), userName: Meteor.user().fullName(), collectionName: "Devices", recordId: Session.get('selectedDevice')});
+            HipaaLogger.logEvent({eventType: "update", userId: Meteor.userId(), userName: Meteor.user().fullName(), collectionName: "Devices", recordId: self.data.deviceId});
             Session.set('devicePageTabIndex', 1);
             Session.set('selectedDevice', false);
             Session.set('deviceUpsert', false);
@@ -301,7 +302,7 @@ export class DeviceDetail extends React.Component {
           Bert.alert(error.reason, 'danger');
         }
         if (result) {
-          HipaaLogger.logEvent({eventType: "create", userId: Meteor.userId(), userName: Meteor.user().fullName(), collectionName: "Devices", recordId: result});
+          HipaaLogger.logEvent({eventType: "create", userId: Meteor.userId(), userName: Meteor.user().fullName(), collectionName: "Devices", recordId: self.data.deviceId});
           Session.set('devicePageTabIndex', 1);
           Session.set('selectedDevice', false);
           Session.set('deviceUpsert', false);
@@ -316,12 +317,13 @@ export class DeviceDetail extends React.Component {
   }
 
   handleDeleteButton(){
+    let self = this;
     Devices.remove({_id: this.data.deviceId}, function(error, result){
       if (error) {
         Bert.alert(error.reason, 'danger');
       }
       if (result) {
-        HipaaLogger.logEvent({eventType: "delete", userId: Meteor.userId(), userName: Meteor.user().fullName(), collectionName: "Devices", recordId: Session.get('selectedDevice')});
+        HipaaLogger.logEvent({eventType: "delete", userId: Meteor.userId(), userName: Meteor.user().fullName(), collectionName: "Devices", recordId: self.data.deviceId});
         Session.set('devicePageTabIndex', 1);
         Session.set('selectedDevice', false);
         Session.set('deviceUpsert', false);
