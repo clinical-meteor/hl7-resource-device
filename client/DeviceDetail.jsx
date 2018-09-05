@@ -1,7 +1,7 @@
 // =======================================================================
 // Using DSTU2  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //
-// https://www.hl7.org/fhir/DSTU2/devices.html
+// https://www.hl7.org/fhir/DSTU2/device.html
 //
 //
 // =======================================================================
@@ -189,7 +189,7 @@ export class DeviceDetail extends React.Component {
     }
   }
   updateFormData(formData, field, textValue){
-    if(process.env.NODE_ENV === "test") console.log("ConditionDetail.updateFormData", formData, field, textValue);
+    if(process.env.NODE_ENV === "test") console.log("DeviceDetail.updateFormData", formData, field, textValue);
 
     switch (field) {
       case "deviceType":
@@ -230,7 +230,7 @@ export class DeviceDetail extends React.Component {
     return deviceData;
   }
   componentDidUpdate(props){
-    if(process.env.NODE_ENV === "test") console.log('DeviceDisplay.componentDidUpdate()', props, this.state)
+    if(process.env.NODE_ENV === "test") console.log('DeviceDetail.componentDidUpdate()', props, this.state)
   }
   changeState(field, event, textValue){
     if(process.env.NODE_ENV === "test") console.log("   ");
