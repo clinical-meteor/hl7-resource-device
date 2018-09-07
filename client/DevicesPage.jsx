@@ -68,7 +68,8 @@ export class DevicesPage extends React.Component {
                   id='newDevice'
                   fhirVersion={ this.data.fhirVersion }
                   device={ this.data.selectedDevice }
-                  deviceId={ this.data.currentDeviceId } />  
+                  deviceId={ this.data.currentDeviceId } 
+                  />  
                </Tab>
                <Tab className="deviceListTab" label='Devices' onActive={this.handleActive} style={this.data.style.tab} value={1}>
                 <DevicesTable />

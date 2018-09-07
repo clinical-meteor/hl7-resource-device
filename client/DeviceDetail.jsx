@@ -9,7 +9,6 @@
 
 import { CardActions, CardText } from 'material-ui/Card';
 
-// import { Bert } from 'meteor/clinical:alert';
 import RaisedButton from 'material-ui/RaisedButton';
 import React from 'react';
 import { ReactMeteorData } from 'meteor/react-meteor-data';
@@ -23,8 +22,6 @@ import { Meteor } from 'meteor/meteor';
 import { Session } from 'meteor/session';
 
 import { GlassCard, VerticalCanvas, Glass } from 'meteor/clinical:glass-ui';
-
-
 
 
 Session.setDefault('deviceUpsert', false);
@@ -336,6 +333,7 @@ export class DeviceDetail extends React.Component {
 
 DeviceDetail.propTypes = {
   id: PropTypes.string,
+  fhirVersion: PropTypes.string,
   deviceId: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
   device: PropTypes.oneOfType([PropTypes.object, PropTypes.bool])
 };

@@ -24,8 +24,7 @@ export default class DevicesTable extends React.Component {
       devices: Devices.find().fetch()
     }
 
-
-    if(process.env.NODE_ENV === "test") console.log("data", data);
+    if(process.env.NODE_ENV === "test") console.log("DevicesTable[data]", data);
     return data;
   };
 
