@@ -269,7 +269,7 @@ export class DeviceDetail extends React.Component {
 
       Devices.update(
         {_id: this.data.deviceId}, {$set: fhirDeviceData }, {
-          validate: false, 
+          validate: true, 
           filter: false, 
           removeEmptyStrings: false
         }, function(error, result) {
@@ -291,7 +291,7 @@ export class DeviceDetail extends React.Component {
       if(process.env.NODE_ENV === "test") console.log("create a new device", fhirDeviceData);
 
       Devices.insert(fhirDeviceData, {
-        validate: false, 
+        validate: true, 
         filter: false, 
         removeEmptyStrings: false
       }, function(error, result) {
