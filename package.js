@@ -1,6 +1,6 @@
 Package.describe({
   name: 'clinical:hl7-resource-device',
-  version: '1.3.5',
+  version: '1.3.6',
   summary: 'HL7 FHIR Resource - Device',
   git: 'https://github.com/clinical-meteor/hl7-resource-device',
   documentation: 'README.md'
@@ -47,5 +47,7 @@ Package.onUse(function (api) {
 });
 
 Npm.depends({
-  "simpl-schema": "1.5.3"
+  "simpl-schema": "1.5.3",
+  "moment": "2.22.2",
+  "lodash": "4.17.4"
 })

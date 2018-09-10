@@ -269,9 +269,9 @@ export class DeviceDetail extends React.Component {
 
       Devices.update(
         {_id: this.data.deviceId}, {$set: fhirDeviceData }, {
-          validate: true, 
-          filter: false, 
-          removeEmptyStrings: false
+          validate: get(Meteor, 'settings.public.defaults.schemas.validate', false), 
+          filter: get(Meteor, 'settings.public.defaults.schemas.filter', false), 
+          removeEmptyStrings: get(Meteor, 'settings.public.defaults.schemas.removeEmptyStrings', false)
         }, function(error, result) {
           if (error) {
             console.log("error", error);
@@ -291,9 +291,9 @@ export class DeviceDetail extends React.Component {
       if(process.env.NODE_ENV === "test") console.log("create a new device", fhirDeviceData);
 
       Devices.insert(fhirDeviceData, {
-        validate: true, 
-        filter: false, 
-        removeEmptyStrings: false
+        validate: get(Meteor, 'settings.public.defaults.schemas.validate', false), 
+        filter: get(Meteor, 'settings.public.defaults.schemas.filter', false), 
+        removeEmptyStrings: get(Meteor, 'settings.public.defaults.schemas.removeEmptyStrings', false)
       }, function(error, result) {
         if (error) {
           Bert.alert(error.reason, 'danger');
