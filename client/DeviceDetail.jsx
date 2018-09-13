@@ -307,7 +307,7 @@ export class DeviceDetail extends React.Component {
 
   handleDeleteButton(){
     let self = this;
-    Devices.remove({_id: this.data.deviceId}, function(error, result){
+    Devices._collection.remove({_id: this.data.deviceId}, function(error, result){
       if (error) {
         Bert.alert(error.reason, 'danger');
       }
